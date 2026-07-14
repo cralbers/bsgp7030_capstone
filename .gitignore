@@ -1,0 +1,4 @@
+.vscode/settings.json
+.DS_Store
+.jupyter_config
+data/
