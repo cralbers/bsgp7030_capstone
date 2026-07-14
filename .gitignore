@@ -2,4 +2,4 @@
 .DS_Store
 .jupyter_config
 data/
-.cursor/plans/
+.cursor/
