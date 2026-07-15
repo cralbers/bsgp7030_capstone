@@ -11,6 +11,7 @@ from flask_caching import Cache
 from theme import COLORS
 
 CSV_PATH = Path(__file__).resolve().parent / "stadium_win_rates.csv"
+COACH_CSV_PATH = Path(__file__).resolve().parent / "coach_win_rates.csv"
 
 app = Dash(__name__)
 server = app.server
@@ -42,6 +43,12 @@ RATE_OPTIONS = {
 def load_stadium_win_rates() -> pd.DataFrame:
     """Load precomputed stadium win rates and coordinates."""
     return pd.read_csv(CSV_PATH)
+
+
+@cache.memoize()
+def load_coach_win_rates() -> pd.DataFrame:
+    """Load precomputed coach home/away win rates."""
+    return pd.read_csv(COACH_CSV_PATH)
 
 
 def build_win_rate_map(rate_mode: str):
@@ -99,6 +106,89 @@ def build_top_stadiums_column_defs(rate_mode: str) -> list[dict]:
         {"field": "City", "headerName": "City"},
         {"field": "matches", "headerName": "Matches"},
         {"field": rate_col, "headerName": meta["rate_header"]},
+    ]
+
+
+def build_coach_scatter(rate_mode: str):
+    """Scatter of coach home (x) vs away (y), colored by selected win rate."""
+    df = load_coach_win_rates()
+    meta = RATE_OPTIONS.get(rate_mode, RATE_OPTIONS["home"])
+    rate_col = meta["column"]
+    fig = px.scatter(
+        df,
+        x="home_win_rate",
+        y="away_win_rate",
+        color=rate_col,
+        size="total_matches",
+        hover_name="Coach Name",
+        hover_data={
+            "home_matches": True,
+            "away_matches": True,
+            "home_win_rate": ":.1f",
+            "away_win_rate": ":.1f",
+            "total_matches": True,
+        },
+        color_continuous_scale="RdYlGn",
+        range_color=[0, 100],
+        title="Coach Win Rates: Home vs Away",
+        labels={
+            "home_win_rate": "Home win rate (%)",
+            "away_win_rate": "Away win rate (%)",
+            "total_matches": "Total matches",
+        },
+        size_max=28,
+    )
+    fig.add_shape(
+        type="line",
+        x0=0,
+        y0=0,
+        x1=100,
+        y1=100,
+        line=dict(color="gray", dash="dash", width=1),
+    )
+    fig.update_xaxes(range=[0, 100])
+    fig.update_yaxes(range=[0, 100])
+    fig.update_layout(
+        coloraxis_colorbar_title=meta["colorbar"],
+        height=550,
+        margin=dict(l=10, r=10, t=50, b=10),
+        paper_bgcolor=COLORS["surface"],
+        font_color=COLORS["text"],
+    )
+    return fig
+
+
+def build_coach_rows() -> list[dict]:
+    """Return coaches sorted by total matches (highest first)."""
+    df = load_coach_win_rates()
+    table = (
+        df[
+            [
+                "Coach Name",
+                "home_matches",
+                "home_win_rate",
+                "away_matches",
+                "away_win_rate",
+                "total_matches",
+            ]
+        ]
+        .sort_values("total_matches", ascending=False)
+        .copy()
+    )
+    table["home_win_rate"] = table["home_win_rate"].round(1)
+    table["away_win_rate"] = table["away_win_rate"].round(1)
+    return table.to_dict("records")
+
+
+def build_coach_column_defs() -> list[dict]:
+    """Column definitions for the coaches AgGrid."""
+    return [
+        {"field": "Coach Name", "headerName": "Coach"},
+        {"field": "home_matches", "headerName": "Home matches"},
+        {"field": "home_win_rate", "headerName": "Home win rate (%)"},
+        {"field": "away_matches", "headerName": "Away matches"},
+        {"field": "away_win_rate", "headerName": "Away win rate (%)"},
+        {"field": "total_matches", "headerName": "Total matches"},
     ]
 
 
@@ -165,6 +255,48 @@ app.layout = html.Div(
                 ),
             ],
         ),
+        html.Div(
+            className="coach-panel",
+            children=[
+                html.H2(
+                    "Coach home vs away win rates",
+                    className="table-title",
+                ),
+                html.P(
+                    "Each point is a coach with at least 3 home and 3 away World Cup matches. "
+                    "The dashed line is equal home and away win rates.",
+                    className="app-subtitle",
+                ),
+                dcc.Loading(
+                    id="coach-scatter-loading",
+                    type="circle",
+                    children=dcc.Graph(
+                        id="coach-home-away-scatter",
+                        figure={},
+                        config={"displayModeBar": True, "responsive": True},
+                    ),
+                ),
+            ],
+        ),
+        html.Div(
+            className="table-panel",
+            children=[
+                html.H2(id="top-coaches-title", className="table-title"),
+                dag.AgGrid(
+                    id="top-coaches-grid",
+                    rowData=[],
+                    columnDefs=[],
+                    columnSize="responsiveSizeToFit",
+                    defaultColDef={"filter": True, "sortable": True},
+                    dashGridOptions={
+                        "theme": "themeBalham",
+                        "animateRows": True,
+                        "pagination": True,
+                        "paginationPageSize": 10,
+                    },
+                ),
+            ],
+        ),
     ],
 )
 
@@ -184,6 +316,23 @@ def update_map_and_table(rate_mode: str):
         build_top_stadiums_rows(mode),
         build_top_stadiums_column_defs(mode),
         meta["table_title"],
+    )
+
+
+@callback(
+    Output("coach-home-away-scatter", "figure"),
+    Output("top-coaches-grid", "rowData"),
+    Output("top-coaches-grid", "columnDefs"),
+    Output("top-coaches-title", "children"),
+    Input("win-rate-mode-radio", "value"),
+)
+def update_coach_scatter(rate_mode: str):
+    mode = rate_mode or "home"
+    return (
+        build_coach_scatter(mode),
+        build_coach_rows(),
+        build_coach_column_defs(),
+        "Coach win rates",
     )
 
 
