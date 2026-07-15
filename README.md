@@ -5,14 +5,14 @@ Exploratory analysis and a Dash app for FIFA World Cup home vs away win rates by
 ## Main directory
 
 
-| File / folder                      | Description                                                                                                          |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `[eda.ipynb](eda.ipynb)`           | Exploratory analysis: load cups, matches, and players; inspect schemas; early goal-trend plots.                      |
-| `[analysis.ipynb](analysis.ipynb)` | Stadium home/away win rates, geocoding, world maps; coach home/away rates and scatter; exports CSVs used by the app. |
-| `[env.yml](env.yml)`               | Conda environment export (channels and package dependencies) used for notebooks and the Dash app.                    |
-| `[run_app.sh](run_app.sh)`         | Activates the `capstone` conda environment and launches the Dash app.                                                |
-| `[.gitignore](.gitignore)`         | Paths excluded from version control.                                                                                 |
-| `[app/](app/)`                     | Dash web application (see below).                                                                                    |
+| File / folder    | Description                                                                                                          |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `eda.ipynb`      | Exploratory analysis: load cups, matches, and players; inspect schemas; early goal-trend plots.                      |
+| `analysis.ipynb` | Stadium home/away win rates, geocoding, world maps; coach home/away rates and scatter; exports CSVs used by the app. |
+| `env.yml`        | Conda environment export (channels and package dependencies) used for notebooks and the Dash app.                    |
+| `run_app.sh`     | Activates the `capstone` conda environment and launches the Dash app.                                                |
+| `.gitignore`     | Paths excluded from version control.                                                                                 |
+| `app/`           | Dash web application (see below).                                                                                    |
 
 
 
@@ -20,14 +20,14 @@ Exploratory analysis and a Dash app for FIFA World Cup home vs away win rates by
 ## `app/` folder
 
 
-| File                                                     | Description                                                                                                                                                                 |
-| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[app/app.py](app/app.py)`                               | Dash app: stadium world map, top-stadiums table, coach home-vs-away scatter, coaches table. A Home/Away radio controls map color, stadium sorting, and coach scatter color. |
-| `[app/theme.py](app/theme.py)`                           | Shared color, spacing, and font constants.                                                                                                                                  |
-| `[app/assets/style.css](app/assets/style.css)`           | Layout and panel styles for the app.                                                                                                                                        |
-| `[app/stadium_win_rates.csv](app/stadium_win_rates.csv)` | Precomputed stadium win rates with latitude/longitude (from `analysis.ipynb`).                                                                                              |
-| `[app/coach_win_rates.csv](app/coach_win_rates.csv)`     | Precomputed coach home/away win rates (from `analysis.ipynb`).                                                                                                              |
-| `[app/requirements.txt](app/requirements.txt)`           | Python package dependencies for the Dash app.                                                                                                                               |
+| File                        | Description                                                                                                                                                                 |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/app.py`                | Dash app: stadium world map, top-stadiums table, coach home-vs-away scatter, coaches table. A Home/Away radio controls map color, stadium sorting, and coach scatter color. |
+| `app/theme.py`              | Shared color, spacing, and font constants.                                                                                                                                  |
+| `app/assets/style.css`      | Layout and panel styles for the app.                                                                                                                                        |
+| `app/stadium_win_rates.csv` | Precomputed stadium win rates with latitude/longitude (from `analysis.ipynb`).                                                                                              |
+| `app/coach_win_rates.csv`   | Precomputed coach home/away win rates (from `analysis.ipynb`).                                                                                                              |
+| `app/requirements.txt`      | Python package dependencies for the Dash app.                                                                                                                               |
 
 
 
