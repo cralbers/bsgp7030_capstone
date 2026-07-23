@@ -1,4 +1,7 @@
-"""Shared theme constants for the stadium win-rate map app."""
+"""Shared theme constants for the stadium win-rate map app.
+
+Keep these in sync with CSS custom properties in assets/style.css.
+"""
 
 COLORS = {
     "text": "#1a1a2e",

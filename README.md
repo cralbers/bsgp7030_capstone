@@ -5,16 +5,17 @@ Exploratory analysis and a Dash app for FIFA World Cup home vs away win rates by
 ## Main directory
 
 
-| File / folder    | Description                                                                                                          |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `eda.ipynb`      | Exploratory analysis: load cups, matches, and players; inspect schemas; early goal-trend plots.                      |
-| `analysis.ipynb` | Stadium home/away win rates, geocoding, world maps; coach home/away rates and scatter (exploratory).                  |
-| `src/fifa_wc/`   | Shared ETL helpers: match outcomes, stadium/coach aggregation, geocoding with disk cache.                            |
-| `scripts/`       | `build_app_csvs.py` regenerates the app CSVs from local `data/` or Kaggle.                                           |
-| `env.yml`        | Conda environment export (channels and package dependencies) used for notebooks and the Dash app.                    |
-| `run_app.sh`     | Activates the `capstone` conda environment and launches the Dash app.                                                |
-| `.gitignore`     | Paths excluded from version control.                                                                                 |
-| `app/`           | Dash web application (see below).                                                                                    |
+| File / folder     | Description                                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `eda.ipynb`       | Exploratory analysis: load cups, matches, and players; inspect schemas; early goal-trend plots.                      |
+| `analysis.ipynb`  | Thin exploratory notebook that calls `src/fifa_wc` for stadium/coach rates and maps.                                 |
+| `src/fifa_wc/`    | Shared ETL helpers: match outcomes, stadium/coach aggregation, geocoding with disk cache.                            |
+| `scripts/`        | `build_app_csvs.py` regenerates the app CSVs from local `data/` or Kaggle.                                           |
+| `pyproject.toml`  | Installable `fifa-wc` package (`pip install -e .`) so notebooks/scripts can import `fifa_wc`.                         |
+| `env.yml`         | Minimal conda env named `capstone` (pandas, plotly, dash stack, jupyter, kagglehub, geopy).                          |
+| `run_app.sh`      | Activates the `capstone` conda environment and launches the Dash app.                                                |
+| `.gitignore`      | Paths excluded from version control (`data/` includes local raw CSVs and `geocode_cache.json`).                       |
+| `app/`            | Dash web application (see below).                                                                                    |
 
 
 
@@ -25,29 +26,31 @@ Exploratory analysis and a Dash app for FIFA World Cup home vs away win rates by
 | File                        | Description                                                                                                                                                                 |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `app/app.py`                | Dash entrypoint: creates the app, cache, layout, and registers callbacks.                                                                                                   |
-| `app/config.py`             | CSV paths, Home/Away `RATE_OPTIONS`, and Plotly defaults.                                                                                                                   |
+| `app/config.py`             | CSV paths, Home/Away/Draw `RATE_OPTIONS`, Plotly defaults, filter defaults.                                                                                                 |
 | `app/schema.py`             | Required CSV columns and validation on load.                                                                                                                                |
-| `app/data.py`               | Cached CSV loaders (after schema validation).                                                                                                                               |
+| `app/data.py`               | Cached CSV loaders plus min-matches / year-span filters.                                                                                                                    |
 | `app/figures.py`            | Stadium map and coach scatter builders.                                                                                                                                     |
 | `app/tables.py`             | AgGrid row/column builders for stadium and coach tables.                                                                                                                    |
-| `app/layout.py`             | Static page layout.                                                                                                                                                         |
-| `app/callbacks.py`          | Home/Away radio → map, tables, and scatter.                                                                                                                                 |
-| `app/theme.py`              | Shared color, spacing, and font constants.                                                                                                                                  |
+| `app/layout.py`             | Static page layout (rate mode, min-matches slider, year range).                                                                                                             |
+| `app/callbacks.py`          | Filters → map, tables, and scatter.                                                                                                                                         |
+| `app/theme.py`              | Shared color, spacing, and font constants (mirrored as CSS variables in `assets/style.css`).                                                                                |
 | `app/assets/style.css`      | Layout and panel styles for the app.                                                                                                                                        |
-| `app/stadium_win_rates.csv` | Precomputed stadium win rates with latitude/longitude (committed so the app runs without rebuilding).                                                                       |
-| `app/coach_win_rates.csv`   | Precomputed coach home/away win rates (committed so the app runs without rebuilding).                                                                                       |
-| `app/requirements.txt`      | Python package dependencies for the Dash app.                                                                                                                               |
+| `app/stadium_win_rates.csv` | Precomputed stadium rates with coords, draw rate, and year span (committed so the app runs without rebuilding).                                                             |
+| `app/coach_win_rates.csv`   | Precomputed coach home/away win rates with year span (committed so the app runs without rebuilding).                                                                        |
+| `app/requirements.txt`      | Python package dependencies for the Dash app only.                                                                                                                          |
 
 
 
 
 ## How to run the app
 
-Create or update the conda environment from the project export if needed:
+Create or update the conda environment:
 
 ```bash
 conda env create -f env.yml
 # or: conda env update -f env.yml --prune
+conda activate capstone
+pip install -e .
 ```
 
 Then:
@@ -65,7 +68,7 @@ cd app
 python app.py
 ```
 
-Install app dependencies if needed: `pip install -r app/requirements.txt`.
+Install app-only deps if needed: `pip install -r app/requirements.txt`.
 
 ## Regenerating app CSVs
 
@@ -73,8 +76,9 @@ Committed CSVs under `app/` are enough to run the dashboard. To rebuild them fro
 
 ```bash
 conda activate capstone
+pip install -e .   # once, so fifa_wc imports resolve
 # from the repository root
 python scripts/build_app_csvs.py
 ```
 
-Geocoding uses `data/geocode_cache.json` (and seeds from the existing stadium CSV) so repeat runs stay fast.
+Geocoding uses `data/geocode_cache.json` (gitignored with `data/`) and seeds from the existing stadium CSV so repeat runs stay fast.

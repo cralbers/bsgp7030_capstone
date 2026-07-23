@@ -1,0 +1,93 @@
+Metadata-Version: 2.4
+Name: fifa-wc
+Version: 0.1.0
+Summary: FIFA World Cup win-rate ETL helpers for the capstone Dash app
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: pandas>=2.0
+Requires-Dist: geopy
+
+# FIFA World Cup Capstone
+
+Exploratory analysis and a Dash app for FIFA World Cup home vs away win rates by stadium and coach, using the [Kaggle FIFA World Cup dataset](https://www.kaggle.com/datasets/abecklas/fifa-world-cup/data).
+
+## Main directory
+
+
+| File / folder     | Description                                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `eda.ipynb`       | Exploratory analysis: load cups, matches, and players; inspect schemas; early goal-trend plots.                      |
+| `analysis.ipynb`  | Thin exploratory notebook that calls `src/fifa_wc` for stadium/coach rates and maps.                                 |
+| `src/fifa_wc/`    | Shared ETL helpers: match outcomes, stadium/coach aggregation, geocoding with disk cache.                            |
+| `scripts/`        | `build_app_csvs.py` regenerates the app CSVs from local `data/` or Kaggle.                                           |
+| `pyproject.toml`  | Installable `fifa-wc` package (`pip install -e .`) so notebooks/scripts can import `fifa_wc`.                         |
+| `env.yml`         | Minimal conda env named `capstone` (pandas, plotly, dash stack, jupyter, kagglehub, geopy).                          |
+| `run_app.sh`      | Activates the `capstone` conda environment and launches the Dash app.                                                |
+| `.gitignore`      | Paths excluded from version control (`data/` includes local raw CSVs and `geocode_cache.json`).                       |
+| `app/`            | Dash web application (see below).                                                                                    |
+
+
+
+
+## `app/` folder
+
+
+| File                        | Description                                                                                                                                                                 |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/app.py`                | Dash entrypoint: creates the app, cache, layout, and registers callbacks.                                                                                                   |
+| `app/config.py`             | CSV paths, Home/Away/Draw `RATE_OPTIONS`, Plotly defaults, filter defaults.                                                                                                 |
+| `app/schema.py`             | Required CSV columns and validation on load.                                                                                                                                |
+| `app/data.py`               | Cached CSV loaders plus min-matches / year-span filters.                                                                                                                    |
+| `app/figures.py`            | Stadium map and coach scatter builders.                                                                                                                                     |
+| `app/tables.py`             | AgGrid row/column builders for stadium and coach tables.                                                                                                                    |
+| `app/layout.py`             | Static page layout (rate mode, min-matches slider, year range).                                                                                                             |
+| `app/callbacks.py`          | Filters → map, tables, and scatter.                                                                                                                                         |
+| `app/theme.py`              | Shared color, spacing, and font constants (mirrored as CSS variables in `assets/style.css`).                                                                                |
+| `app/assets/style.css`      | Layout and panel styles for the app.                                                                                                                                        |
+| `app/stadium_win_rates.csv` | Precomputed stadium rates with coords, draw rate, and year span (committed so the app runs without rebuilding).                                                             |
+| `app/coach_win_rates.csv`   | Precomputed coach home/away win rates with year span (committed so the app runs without rebuilding).                                                                        |
+| `app/requirements.txt`      | Python package dependencies for the Dash app only.                                                                                                                          |
+
+
+
+
+## How to run the app
+
+Create or update the conda environment:
+
+```bash
+conda env create -f env.yml
+# or: conda env update -f env.yml --prune
+conda activate capstone
+pip install -e .
+```
+
+Then:
+
+```bash
+# from the repository root
+./run_app.sh
+```
+
+Or manually:
+
+```bash
+conda activate capstone
+cd app
+python app.py
+```
+
+Install app-only deps if needed: `pip install -r app/requirements.txt`.
+
+## Regenerating app CSVs
+
+Committed CSVs under `app/` are enough to run the dashboard. To rebuild them from raw data (local `data/WorldCupMatches.csv` and `data/WorldCupPlayers.csv`, or Kaggle if those are missing):
+
+```bash
+conda activate capstone
+pip install -e .   # once, so fifa_wc imports resolve
+# from the repository root
+python scripts/build_app_csvs.py
+```
+
+Geocoding uses `data/geocode_cache.json` (gitignored with `data/`) and seeds from the existing stadium CSV so repeat runs stay fast.

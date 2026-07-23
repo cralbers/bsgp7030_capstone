@@ -12,6 +12,8 @@ def clean_matches_for_stadiums(matches_df: pd.DataFrame) -> pd.DataFrame:
     m["City"] = m["City"].astype(str).str.strip()
     m["Home Team Goals"] = pd.to_numeric(m["Home Team Goals"], errors="coerce")
     m["Away Team Goals"] = pd.to_numeric(m["Away Team Goals"], errors="coerce")
+    if "Year" in m.columns:
+        m["Year"] = pd.to_numeric(m["Year"], errors="coerce")
     m = m.dropna(subset=["Stadium", "Home Team Goals", "Away Team Goals"])
     m = m[m["Stadium"].ne("") & m["Stadium"].ne("nan")]
 
@@ -26,6 +28,8 @@ def clean_matches_for_coaches(matches_df: pd.DataFrame) -> pd.DataFrame:
     m = matches_df.copy()
     m["Home Team Goals"] = pd.to_numeric(m["Home Team Goals"], errors="coerce")
     m["Away Team Goals"] = pd.to_numeric(m["Away Team Goals"], errors="coerce")
+    if "Year" in m.columns:
+        m["Year"] = pd.to_numeric(m["Year"], errors="coerce")
     return m.dropna(
         subset=[
             "MatchID",

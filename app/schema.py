@@ -14,6 +14,12 @@ STADIUM_REQUIRED_COLUMNS = (
     "lon",
 )
 
+STADIUM_OPTIONAL_COLUMNS = (
+    "draw_rate",
+    "year_min",
+    "year_max",
+)
+
 COACH_REQUIRED_COLUMNS = (
     "Coach Name",
     "home_matches",
@@ -23,6 +29,11 @@ COACH_REQUIRED_COLUMNS = (
     "away_wins",
     "away_win_rate",
     "total_matches",
+)
+
+COACH_OPTIONAL_COLUMNS = (
+    "year_min",
+    "year_max",
 )
 
 

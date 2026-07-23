@@ -34,6 +34,9 @@ STADIUM_EXPORT_COLUMNS = [
     "matches",
     "home_win_rate",
     "away_win_rate",
+    "draw_rate",
+    "year_min",
+    "year_max",
     "lat",
     "lon",
 ]
@@ -72,13 +75,15 @@ def main() -> None:
     print(f"Stadiums with enough matches: {len(map_df)}")
 
     map_df = geocode_stadiums(map_df)
-    stadium_export = map_df[STADIUM_EXPORT_COLUMNS]
+    stadium_cols = [c for c in STADIUM_EXPORT_COLUMNS if c in map_df.columns]
+    stadium_export = map_df[stadium_cols]
     STADIUM_CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
     stadium_export.to_csv(STADIUM_CSV_PATH, index=False)
     print(f"Wrote {STADIUM_CSV_PATH} ({len(stadium_export)} stadiums)")
 
     coach_rates = aggregate_coach_rates(matches_df, players_df)
-    coach_export = coach_rates[COACH_EXPORT_COLUMNS]
+    coach_cols = [c for c in COACH_EXPORT_COLUMNS if c in coach_rates.columns]
+    coach_export = coach_rates[coach_cols]
     coach_export.to_csv(COACH_CSV_PATH, index=False)
     print(f"Wrote {COACH_CSV_PATH} ({len(coach_export)} coaches)")
 

@@ -2,20 +2,35 @@
 
 from __future__ import annotations
 
-from config import RATE_OPTIONS
-from data import load_coach_win_rates, load_stadium_win_rates
+from config import (
+    DEFAULT_MIN_MATCHES,
+    RATE_OPTIONS,
+    YEAR_MAX,
+    YEAR_MIN,
+)
+from data import filter_coaches, filter_stadiums
 
 
-def build_top_stadiums_rows(rate_mode: str) -> list[dict]:
+def build_top_stadiums_rows(
+    rate_mode: str,
+    *,
+    min_matches: int = DEFAULT_MIN_MATCHES,
+    year_start: int = YEAR_MIN,
+    year_end: int = YEAR_MAX,
+) -> list[dict]:
     """Return stadiums sorted by the selected win rate (highest first)."""
-    df = load_stadium_win_rates()
+    df = filter_stadiums(
+        min_matches=min_matches,
+        year_start=year_start,
+        year_end=year_end,
+    )
     meta = RATE_OPTIONS.get(rate_mode, RATE_OPTIONS["home"])
     rate_col = meta["column"]
-    table = (
-        df[["Stadium", "City", "matches", rate_col]]
-        .sort_values(rate_col, ascending=False)
-        .copy()
-    )
+    if rate_col not in df.columns:
+        rate_col = "home_win_rate"
+        meta = RATE_OPTIONS["home"]
+    cols = ["Stadium", "City", "matches", rate_col]
+    table = df[cols].sort_values(rate_col, ascending=False).copy()
     table[rate_col] = table[rate_col].round(1)
     return table.to_dict("records")
 
@@ -32,9 +47,18 @@ def build_top_stadiums_column_defs(rate_mode: str) -> list[dict]:
     ]
 
 
-def build_coach_rows() -> list[dict]:
+def build_coach_rows(
+    *,
+    min_matches: int = DEFAULT_MIN_MATCHES,
+    year_start: int = YEAR_MIN,
+    year_end: int = YEAR_MAX,
+) -> list[dict]:
     """Return coaches sorted by total matches (highest first)."""
-    df = load_coach_win_rates()
+    df = filter_coaches(
+        min_matches=min_matches,
+        year_start=year_start,
+        year_end=year_end,
+    )
     table = (
         df[
             [

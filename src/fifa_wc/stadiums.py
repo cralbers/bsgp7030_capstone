@@ -9,17 +9,22 @@ from fifa_wc.outcomes import clean_matches_for_stadiums
 
 
 def aggregate_stadium_rates(matches_df: pd.DataFrame) -> pd.DataFrame:
-    """Aggregate home/away/draw rates (%) by stadium."""
+    """Aggregate home/away/draw rates (%) by stadium, plus year span."""
     m = clean_matches_for_stadiums(matches_df)
+    agg_kwargs = dict(
+        City=("City", "first"),
+        matches=("home_win", "size"),
+        home_win_rate=("home_win", "mean"),
+        away_win_rate=("away_win", "mean"),
+        draw_rate=("draw", "mean"),
+    )
+    if "Year" in m.columns:
+        agg_kwargs["year_min"] = ("Year", "min")
+        agg_kwargs["year_max"] = ("Year", "max")
+
     stadium_rates = (
         m.groupby("Stadium", as_index=False)
-        .agg(
-            City=("City", "first"),
-            matches=("home_win", "size"),
-            home_win_rate=("home_win", "mean"),
-            away_win_rate=("away_win", "mean"),
-            draw_rate=("draw", "mean"),
-        )
+        .agg(**agg_kwargs)
         .sort_values("matches", ascending=False)
     )
     stadium_rates["home_win_rate"] *= 100

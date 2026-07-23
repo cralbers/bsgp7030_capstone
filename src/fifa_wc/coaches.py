@@ -43,14 +43,23 @@ def aggregate_coach_rates(
         away_coach["Away Team Goals"] > away_coach["Home Team Goals"]
     ).astype(int)
 
-    home_agg = home_coach.groupby("Coach Name", as_index=False).agg(
+    home_agg_kwargs = dict(
         home_matches=("win", "size"),
         home_wins=("win", "sum"),
     )
-    away_agg = away_coach.groupby("Coach Name", as_index=False).agg(
+    away_agg_kwargs = dict(
         away_matches=("win", "size"),
         away_wins=("win", "sum"),
     )
+    if "Year" in home_coach.columns:
+        home_agg_kwargs["home_year_min"] = ("Year", "min")
+        home_agg_kwargs["home_year_max"] = ("Year", "max")
+    if "Year" in away_coach.columns:
+        away_agg_kwargs["away_year_min"] = ("Year", "min")
+        away_agg_kwargs["away_year_max"] = ("Year", "max")
+
+    home_agg = home_coach.groupby("Coach Name", as_index=False).agg(**home_agg_kwargs)
+    away_agg = away_coach.groupby("Coach Name", as_index=False).agg(**away_agg_kwargs)
 
     coach_rates = home_agg.merge(away_agg, on="Coach Name", how="inner")
     coach_rates = coach_rates[
@@ -66,6 +75,21 @@ def aggregate_coach_rates(
     coach_rates["total_matches"] = (
         coach_rates["home_matches"] + coach_rates["away_matches"]
     )
+    if "home_year_min" in coach_rates.columns:
+        coach_rates["year_min"] = coach_rates[
+            ["home_year_min", "away_year_min"]
+        ].min(axis=1)
+        coach_rates["year_max"] = coach_rates[
+            ["home_year_max", "away_year_max"]
+        ].max(axis=1)
+        coach_rates = coach_rates.drop(
+            columns=[
+                "home_year_min",
+                "home_year_max",
+                "away_year_min",
+                "away_year_max",
+            ]
+        )
     return coach_rates.sort_values("total_matches", ascending=False).reset_index(
         drop=True
     )
@@ -80,4 +104,6 @@ COACH_EXPORT_COLUMNS = [
     "away_wins",
     "away_win_rate",
     "total_matches",
+    "year_min",
+    "year_max",
 ]

@@ -13,6 +13,7 @@ RATE_OPTIONS = {
         "colorbar": "Home win rate (%)",
         "rate_header": "Home win rate (%)",
         "table_title": "Highest home win rates",
+        "applies_to_coach": True,
     },
     "away": {
         "column": "away_win_rate",
@@ -20,6 +21,15 @@ RATE_OPTIONS = {
         "colorbar": "Away win rate (%)",
         "rate_header": "Away win rate (%)",
         "table_title": "Highest away win rates",
+        "applies_to_coach": True,
+    },
+    "draw": {
+        "column": "draw_rate",
+        "title": "Draw Rate by Stadium",
+        "colorbar": "Draw rate (%)",
+        "rate_header": "Draw rate (%)",
+        "table_title": "Highest draw rates",
+        "applies_to_coach": False,
     },
 }
 
@@ -27,3 +37,7 @@ COLOR_SCALE = "RdYlGn"
 RANGE_COLOR = [0, 100]
 PROJECTION = "natural earth"
 SIZE_MAX = 28
+
+DEFAULT_MIN_MATCHES = 3
+YEAR_MIN = 1930
+YEAR_MAX = 2014
