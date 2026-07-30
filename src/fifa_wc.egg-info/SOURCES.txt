@@ -1,0 +1,13 @@
+README.md
+pyproject.toml
+src/fifa_wc/__init__.py
+src/fifa_wc/coaches.py
+src/fifa_wc/config.py
+src/fifa_wc/geocode.py
+src/fifa_wc/outcomes.py
+src/fifa_wc/stadiums.py
+src/fifa_wc.egg-info/PKG-INFO
+src/fifa_wc.egg-info/SOURCES.txt
+src/fifa_wc.egg-info/dependency_links.txt
+src/fifa_wc.egg-info/requires.txt
+src/fifa_wc.egg-info/top_level.txt

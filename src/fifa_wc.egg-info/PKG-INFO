@@ -1,3 +1,12 @@
+Metadata-Version: 2.4
+Name: fifa-wc
+Version: 0.1.0
+Summary: FIFA World Cup win-rate ETL helpers for the capstone Dash app
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: pandas>=2.0
+Requires-Dist: geopy
+
 # FIFA World Cup Capstone
 
 Exploratory analysis and a Dash app for FIFA World Cup home vs away win rates by stadium and coach, using the [Kaggle FIFA World Cup dataset](https://www.kaggle.com/datasets/abecklas/fifa-world-cup/data).
@@ -5,17 +14,17 @@ Exploratory analysis and a Dash app for FIFA World Cup home vs away win rates by
 ## Main directory
 
 
-| File / folder                 | Description                                                                                                          |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `eda.ipynb`                   | Exploratory analysis: load cups, matches, and players; inspect schemas; early goal-trend plots.                      |
-| `analysis.ipynb`              | Thin exploratory notebook that calls `src/fifa_wc` for stadium/coach rates and maps.                                 |
-| `src/fifa_wc/`                | Shared ETL helpers: match outcomes, stadium/coach aggregation, geocoding with disk cache.                            |
-| `scripts/build_app_csvs.py`   | Regenerates the app CSVs from local `data/` or Kaggle.                                                               |
-| `pyproject.toml`              | Installable `fifa-wc` package (`pip install -e .`) so notebooks/scripts can import `fifa_wc`.                         |
-| `env.yml`                     | Minimal conda env named `capstone` (pandas, plotly, dash stack, jupyter, kagglehub, geopy).                          |
-| `run_app.sh`                  | Activates the `capstone` conda environment and launches the Dash app.                                                |
-| `.gitignore`                  | Paths excluded from version control (`data/` includes local raw CSVs and `geocode_cache.json`).                       |
-| `app/`                        | Dash web application (see below).                                                                                    |
+| File / folder     | Description                                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `eda.ipynb`       | Exploratory analysis: load cups, matches, and players; inspect schemas; early goal-trend plots.                      |
+| `analysis.ipynb`  | Thin exploratory notebook that calls `src/fifa_wc` for stadium/coach rates and maps.                                 |
+| `src/fifa_wc/`    | Shared ETL helpers: match outcomes, stadium/coach aggregation, geocoding with disk cache.                            |
+| `scripts/`        | `build_app_csvs.py` regenerates the app CSVs from local `data/` or Kaggle.                                           |
+| `pyproject.toml`  | Installable `fifa-wc` package (`pip install -e .`) so notebooks/scripts can import `fifa_wc`.                         |
+| `env.yml`         | Minimal conda env named `capstone` (pandas, plotly, dash stack, jupyter, kagglehub, geopy).                          |
+| `run_app.sh`      | Activates the `capstone` conda environment and launches the Dash app.                                                |
+| `.gitignore`      | Paths excluded from version control (`data/` includes local raw CSVs and `geocode_cache.json`).                       |
+| `app/`            | Dash web application (see below).                                                                                    |
 
 
 
@@ -42,7 +51,7 @@ Exploratory analysis and a Dash app for FIFA World Cup home vs away win rates by
 
 
 
-## Installation
+## How to run the app
 
 Create or update the conda environment:
 
@@ -53,9 +62,7 @@ conda activate capstone
 pip install -e .
 ```
 
-Install app-only deps if needed: `pip install -r app/requirements.txt`.
-
-## Usage
+Then:
 
 ```bash
 # from the repository root
@@ -70,7 +77,9 @@ cd app
 python app.py
 ```
 
-### Regenerating app CSVs
+Install app-only deps if needed: `pip install -r app/requirements.txt`.
+
+## Regenerating app CSVs
 
 Committed CSVs under `app/` are enough to run the dashboard. To rebuild them from raw data (local `data/WorldCupMatches.csv` and `data/WorldCupPlayers.csv`, or Kaggle if those are missing):
 
