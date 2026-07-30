@@ -5,17 +5,17 @@ Exploratory analysis and a Dash app for FIFA World Cup home vs away win rates by
 ## Main directory
 
 
-| File / folder     | Description                                                                                                          |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `eda.ipynb`       | Exploratory analysis: load cups, matches, and players; inspect schemas; early goal-trend plots.                      |
-| `analysis.ipynb`  | Thin exploratory notebook that calls `src/fifa_wc` for stadium/coach rates and maps.                                 |
-| `src/fifa_wc/`    | Shared ETL helpers: match outcomes, stadium/coach aggregation, geocoding with disk cache.                            |
-| `scripts/`        | `build_app_csvs.py` regenerates the app CSVs from local `data/` or Kaggle.                                           |
-| `pyproject.toml`  | Installable `fifa-wc` package (`pip install -e .`) so notebooks/scripts can import `fifa_wc`.                         |
-| `env.yml`         | Minimal conda env named `capstone` (pandas, plotly, dash stack, jupyter, kagglehub, geopy).                          |
-| `run_app.sh`      | Activates the `capstone` conda environment and launches the Dash app.                                                |
-| `.gitignore`      | Paths excluded from version control (`data/` includes local raw CSVs and `geocode_cache.json`).                       |
-| `app/`            | Dash web application (see below).                                                                                    |
+| File / folder                 | Description                                                                                                          |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `eda.ipynb`                   | Exploratory analysis: load cups, matches, and players; inspect schemas; early goal-trend plots.                      |
+| `analysis.ipynb`              | Thin exploratory notebook that calls `src/fifa_wc` for stadium/coach rates and maps.                                 |
+| `src/fifa_wc/`                | Shared ETL helpers: match outcomes, stadium/coach aggregation, geocoding with disk cache.                            |
+| `scripts/build_app_csvs.py`   | Regenerates the app CSVs from local `data/` or Kaggle.                                                               |
+| `pyproject.toml`              | Installable `fifa-wc` package (`pip install -e .`) so notebooks/scripts can import `fifa_wc`.                         |
+| `env.yml`                     | Minimal conda env named `capstone` (pandas, plotly, dash stack, jupyter, kagglehub, geopy).                          |
+| `run_app.sh`                  | Activates the `capstone` conda environment and launches the Dash app.                                                |
+| `.gitignore`                  | Paths excluded from version control (`data/` includes local raw CSVs and `geocode_cache.json`).                       |
+| `app/`                        | Dash web application (see below).                                                                                    |
 
 
 
@@ -42,7 +42,7 @@ Exploratory analysis and a Dash app for FIFA World Cup home vs away win rates by
 
 
 
-## How to run the app
+## Installation
 
 Create or update the conda environment:
 
@@ -53,7 +53,9 @@ conda activate capstone
 pip install -e .
 ```
 
-Then:
+Install app-only deps if needed: `pip install -r app/requirements.txt`.
+
+## Usage
 
 ```bash
 # from the repository root
@@ -68,9 +70,7 @@ cd app
 python app.py
 ```
 
-Install app-only deps if needed: `pip install -r app/requirements.txt`.
-
-## Regenerating app CSVs
+### Regenerating app CSVs
 
 Committed CSVs under `app/` are enough to run the dashboard. To rebuild them from raw data (local `data/WorldCupMatches.csv` and `data/WorldCupPlayers.csv`, or Kaggle if those are missing):
 
